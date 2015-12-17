@@ -5,7 +5,7 @@ RUN apt-get update -y && \
     add-apt-repository ppa:webupd8team/java -y && \
     apt-get update -y && \
     echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
-    apt-get install -y oracle-java8-installer && \
+    apt-get install -y oracle-java8-installer git && \
     apt-get remove software-properties-common -y && \
     apt-get autoremove -y && \
     apt-get clean
@@ -30,10 +30,10 @@ RUN dpkg --add-architecture i386 && \
     apt-get clean
 
 # Installs Android SDK
-ENV ANDROID_SDK_FILENAME android-sdk_r23.0.2-linux.tgz
+ENV ANDROID_SDK_FILENAME android-sdk_r24.4.1-linux.tgz
 ENV ANDROID_SDK_URL http://dl.google.com/android/${ANDROID_SDK_FILENAME}
-ENV ANDROID_API_LEVELS android-15,android-16,android-17,android-18,android-19,android-20,android-21 
-ENV ANDROID_BUILD_TOOLS_VERSION 21.1.0
+ENV ANDROID_API_LEVELS android-15,android-16,android-17,android-18,android-19,android-20,android-21,android-22 
+ENV ANDROID_BUILD_TOOLS_VERSION 23.0.2
 ENV ANDROID_HOME /opt/android-sdk-linux
 ENV PATH ${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools
 RUN cd /opt && \
@@ -52,12 +52,15 @@ ENV PATH ${PATH}:/opt/node/bin
 
 # Installs Cordova
 # Forces a platform add in order to preload libraries
+
 RUN npm install -g npm && \
     npm install -g cordova && \
     cd /tmp && \
     cordova create fakeapp && \
     cd /tmp/fakeapp && \
     cordova platform add android && \
+    cordova plugin add cordova-plugin-crosswalk-webview && \
+    cordova build android && \
     cd && \
     rm -rf /tmp/fakeapp
 
@@ -65,4 +68,3 @@ VOLUME ["/data"]
 WORKDIR /data
 
 EXPOSE 8000
-
